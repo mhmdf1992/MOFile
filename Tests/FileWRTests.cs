@@ -12,7 +12,7 @@ public class FileWRTests
     [InlineData("hello world")]
     [InlineData("lorem ipsum")]
     [InlineData("banananana")]
-    public void WriteReadTest_WriteReturnPosition_ReadPositionEqualsInputText(string input)
+    public void WriteReadTest_WriteReturnPosition_ReadPositionEqualsInputTextTest(string input)
     {
         var position = _fileWR.Write(input);
         var res = _fileWR.Read(position, _fileWR.Encoding.GetByteCount(input));
@@ -20,7 +20,7 @@ public class FileWRTests
     }
 
     [Fact]
-    public void Append_ConcurrentAppend_AllInputsExistsInRead(){
+    public void Append_ConcurrentAppend_AllInputsExistsInReadTest(){
         var arr = new string[]{
             "hello",
             "world",
@@ -35,29 +35,31 @@ public class FileWRTests
             Assert.Contains(item, all);
         }
     }
-    
-    // [Theory]
-    // [InlineData("bahama")]
-    // [InlineData("mama")]
-    // [InlineData("pijama")]
-    // [InlineData("didi")]
-    // [InlineData("baba")]
-    // public void Append_RetrunedPositionEqualsFindTextAppended(string input)
-    // {
-    //     var pos = _fileWR.Append(input.ToUpper());
-    //     var positions =  _fileWR.Find(input.ToLower(), true);
-    //     Assert.Contains(pos, positions);
-    // }
 
     [Fact]
-    public void Clear_FileSizeEqualsZero()
+    public void Clear_FileSizeEqualsZeroTest()
     {
         _fileWR.Clear();
         Assert.Equal(0, _fileWR.Size);
     }
 
+    [Theory]
+    [InlineData("jbnijbniubiuui")]
+    [InlineData("jbnijbniubiuuiiuahbsfiuyshgh")]
+    [InlineData("jbnijbniubiuuihjbuyibuy")]
+    [InlineData("jbnijbniubiuuifssf")]
+    public void Push_PushedEqualsPopedTest_SizeBeforePushPopEqualSizeAfterPushPopTest(string input)
+    {
+        var size = _fileWR.Size;
+        var inputBytes = Encoding.UTF8.GetBytes(input);
+        ((IStack)_fileWR).Push(inputBytes);
+        var res = ((IStack)_fileWR).Pop(inputBytes.Length);
+        Assert.Equal(input, Encoding.UTF8.GetString(res));
+        Assert.Equal(size, _fileWR.Size);
+    }
+
     [Fact]
-    public void AppendList_ReadReturnedReadObjResultEqualsInputValue()
+    public void AppendList_ReadReturnedReadObjResultEqualsInputValueTest()
     {
         _fileWR = new FileWR(Path.Combine(Directory.GetCurrentDirectory(),"db.txt"));
         var hash = new Dictionary<string, string>();
