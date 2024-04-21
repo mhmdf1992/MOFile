@@ -9,6 +9,7 @@ namespace MO.MOFile{
         string Read(long startPosition = 0, int? length = null);
         IEnumerable<string> Read(IEnumerable<ReadObject> readObjects);
         Stream GetStreamForRead(long startPosition = 0);
+        T OpenStreamForWrite<T>(Func<Stream,T> func);
         long Write(string text, long startPosition = 0);
         long WriteBytes(byte[] bytes, long startPosition = 0);
         long Append(string text);
@@ -18,7 +19,6 @@ namespace MO.MOFile{
         long AppendStream(Stream stream);
         long AppendBytes(byte[] bytes);
         void Clear();
-        IEnumerable<long> Find(string text, bool ignoreCase = false);
         FileInfo FileInfo {get;}
         long Size {get;}
         Encoding Encoding {get;}

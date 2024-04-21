@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 
 namespace MO.MOFile{
-    public class FileWR : IFileWR
+    public class FileWR : IFileWR, IStack
     {
         protected Encoding _encoding;
         protected string _path;
@@ -207,18 +207,6 @@ namespace MO.MOFile{
             return false;
         }
 
-        public IEnumerable<long> Find(string text, bool ignoreCase = false)
-        {
-            if(string.IsNullOrEmpty(text))
-                throw new ArgumentException(message: "Text can not be null or empty", paramName: "text");
-            // using var fstream = GetStreamForRead();
-            // var byteSequence = _encoding.GetBytes(text);
-            // var buffer = new byte[fstream.Length];
-            // fstream.Read(buffer, 0, (int)fstream.Length);
-            // return buffer.IndicesOf(byteSequence, ignoreCase);
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<KeyValuePair<string, ReadObject>> AppendList(KeyValuePair<string, string>[] list)
         {
             var res = new List<KeyValuePair<string, ReadObject>>();
@@ -255,6 +243,49 @@ namespace MO.MOFile{
                     var bytes = list[i];
                     fstream.Write(bytes, 0, bytes.Length);
                 }
+            }catch{
+                throw;
+            }finally{
+                fstream?.Dispose();
+            }
+        }
+
+        public byte[] Pop(int length)
+        {
+            Stream fstream;
+            while(IsBusy(out fstream)){
+                Thread.Sleep(1);
+            }
+            try{
+                if(fstream.Length == 0)
+                    return null;
+                fstream.Seek(length * -1, SeekOrigin.End);
+                var buffer = new byte[length];
+                fstream.Read(buffer, 0, length);
+                fstream.SetLength(fstream.Length - length);
+                return buffer;
+            }catch{
+                throw;
+            }finally{
+                fstream?.Dispose();
+            }
+        }
+
+        public long Push(byte[] bytes)
+        {
+            return AppendBytes(bytes);
+        }
+
+        public T OpenStreamForWrite<T>(Func<Stream,T> func)
+        {
+            Stream fstream;
+            while(IsBusy(out fstream)){
+                Thread.Sleep(1);
+            }
+            try{
+                if(func == null)
+                    return default;
+                return func(fstream);
             }catch{
                 throw;
             }finally{
