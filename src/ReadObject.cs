@@ -1,5 +1,5 @@
 namespace MO.MOFile{
-    public struct ReadObject{
+    public class ReadObject{
         public ReadObject(long pos, int len){
             _position = pos;
             _length = len;

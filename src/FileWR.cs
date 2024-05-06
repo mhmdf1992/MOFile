@@ -231,6 +231,30 @@ namespace MO.MOFile{
             }
         }
 
+        public IEnumerable<KeyValuePair<object, ReadObject>> AppendList(KeyValuePair<object, string>[] list)
+        {
+            var res = new List<KeyValuePair<object, ReadObject>>();
+            Stream fstream;
+            while(IsBusy(out fstream)){
+                Thread.Sleep(1);
+            }
+            try{
+                for(int i = 0; i < list.Length; i ++){
+                    var position = fstream.Length;
+                    fstream.Seek(0, SeekOrigin.End);
+                    var item = list[i];
+                    var bytes = _encoding.GetBytes(item.Value);
+                    fstream.Write(bytes, 0, bytes.Length);
+                    res.Add(new KeyValuePair<object, ReadObject>(item.Key, new ReadObject(position, bytes.Length)));
+                }
+                return res;
+            }catch{
+                throw;
+            }finally{
+                fstream?.Dispose();
+            }
+        }
+
         public void AppendBytes(byte[][] list){
             Stream fstream;
             while(IsBusy(out fstream)){

@@ -14,6 +14,7 @@ namespace MO.MOFile{
         long WriteBytes(byte[] bytes, long startPosition = 0);
         long Append(string text);
         IEnumerable<KeyValuePair<string,ReadObject>> AppendList(KeyValuePair<string, string>[] list);
+        IEnumerable<KeyValuePair<object,ReadObject>> AppendList(KeyValuePair<object, string>[] list);
         void AppendBytes(byte[][] list);
         long WriteStream(Stream stream, long startPosition = 0);
         long AppendStream(Stream stream);
